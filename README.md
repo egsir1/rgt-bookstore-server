@@ -61,3 +61,51 @@ npx prisma db push for current MVP
 
 npx prisma migrate dev --name init
 npx prisma migrate deploy
+
+🔌 API Endpoints
+Method Endpoint Description
+POST /auth/login User login
+(WIP) /auth/register User registration
+(WIP) /books Book CRUD (next)
+
+🛠 Setup Instructions
+
+1. Clone the Repository
+   git clone https://github.com/egsir1/online-bookstore-api.git
+   cd online-bookstore-api
+
+2. Install Dependencies
+   npm install
+
+3. Configure .env
+   DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/online_bookstore"
+   JWT_SECRET="jwt_secret"
+
+4. Prisma Setup
+   npx prisma migrate dev --name init
+   npx prisma generate
+
+5. Start Development Server
+   npm run start:dev
+   🧪 Tech Stack
+   Backend: NestJS + TypeScript
+
+ORM: Prisma
+
+Database: PostgreSQL
+
+Authentication: JWT
+
+Password Security: bcrypt
+
+📌 TODO (Next Steps)
+Add register endpoint (POST /auth/register)
+
+Create Book module with full CRUD
+
+Protect routes with JWT guards
+
+Implement pagination, filtering, and sales tracking
+
+🧑‍💻 Developer
+Sirojiddin Egamberdiev

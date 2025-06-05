@@ -14,11 +14,49 @@ model User {
   password  String
   name      String
   role      Role     @default(USER)
+  books     Book[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model Book {
+  id           Int      @id @default(autoincrement())
+  title        String
+  author       String
+  description  String?
+  price        Float
+  amount       Int      @default(0)   // inventory count
+  thumbnailUrl String?             
+  soldCount    Int      @default(0)   // total sold
+  ratings      Int      @default(0)
+  edition      String?
+  publisher    String?
+  publication_date      DateTime
+  category     BookCategory
+  language     String
+  print_length Int
+  ownerId      Int
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+
+
 enum Role {
   USER
   ADMIN
+}
+
+enum BookCategory {
+  FICTION
+  NONFICTION
+  SCIENCE
+  TECHNOLOGY
+  HISTORY
+  BIOGRAPHY
+  SELF_HELP
+  BUSINESS
+  CHILDREN
+  FANTASY
 }

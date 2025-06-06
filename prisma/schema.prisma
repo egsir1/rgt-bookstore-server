@@ -25,7 +25,7 @@ model Book {
   author       String
   description  String?
   price        Float
-  amount       Int      @default(0)   // inventory count
+  amount       Int        
   thumbnailUrl String?             
   soldCount    Int      @default(0)   // total sold
   ratings      Int      @default(0)

@@ -1,0 +1,20 @@
+export enum Message {
+  SOMETHING_WENT_WRONG = 'Something went wrong!',
+  NO_DATA_FOUND = 'No data found!',
+  CREATE_FAILED = 'Create failed!',
+  UPDATE_FAILED = 'Update failed!',
+  DELETE_FAILED = 'Delete failed!',
+  REMOVE_FAILED = 'Remove failed!',
+  UPLOAD_FAILED = 'Upload failed!',
+  BAD_REQUEST = 'Bad Request!',
+
+  USED_EMAIL = 'Already used email',
+  NO_NICK = 'No user with that email!',
+  NO_EMAIL = 'Email not found.',
+  BLOCKED_USER = 'You have been blocked',
+  WRONG_PASSWORD = 'Invalid credentials, try again!',
+  NOT_AUTHENTICATED = 'You are not authenticated, please login first',
+  TOKEN_NOT_EXIST = 'Token is invalid or expired',
+  ONLY_SPECIFIC_ROLES_ALLOWED = 'Allowed only for users with specific roles',
+  NOT_ALLOWED_REQUEST = 'Not Allowed Request!',
+}

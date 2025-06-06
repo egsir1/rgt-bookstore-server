@@ -51,7 +51,7 @@ export class RolesGuard implements CanActivate {
       request.user = user;
       return true;
     } catch (err) {
-      this.logger.error(`AuthGuard Error: ${err}`);
+      this.logger.error(`RolesGuard Error: ${err}`);
       throw new UnauthorizedException(Message.ONLY_SPECIFIC_ROLES_ALLOWED);
     }
   }

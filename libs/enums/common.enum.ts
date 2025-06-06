@@ -22,5 +22,9 @@ export enum Message {
   EMAIL_NOT_VERIFIED = 'Email not verified',
   TOKEN_MISSING = 'Authorization token is missing',
   BOOK_DUPLICATE = 'Book already exists.',
-  UNAUTHORIZED_ACTION = 'You are not authorized for that action ',
+  UNAUTHORIZED_ACTION = 'You are not authorized for that action',
+  ALLOWED_IMG_TYPES = 'Only jpg, jpeg, png files are allowed!',
+  INVALID_UPLOAD = 'Invalid upload type.',
+  NO_FILE_UPLOAD = 'No file uploaded',
+  FILE_NOT_EXIST = 'File does not exist.',
 }

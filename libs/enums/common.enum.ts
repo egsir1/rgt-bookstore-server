@@ -12,7 +12,7 @@ export enum Message {
   NO_NICK = 'No user with that email!',
   NO_EMAIL = 'Email not found.',
   BLOCKED_USER = 'You have been blocked',
-  WRONG_PASSWORD = 'Invalid credentials, try again!',
+  INVALID_CREDENTIALS = 'Invalid credentials, try again!',
   NOT_AUTHENTICATED = 'You are not authenticated, please login first',
   TOKEN_NOT_EXIST = 'Token is invalid or expired',
   ONLY_SPECIFIC_ROLES_ALLOWED = 'Allowed only for users with specific roles',
@@ -20,4 +20,5 @@ export enum Message {
   VERIFIED_EMAIL = 'Email already verified',
   USER_NOT_FOUND = 'User not found',
   INVALID_CODE = 'Invalid activation code.',
+  EMAIL_NOT_VERIFIED = 'Email not verified',
 }

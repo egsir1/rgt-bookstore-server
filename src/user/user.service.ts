@@ -75,7 +75,7 @@ export class UserService {
   }
 
   // verify email
-  async verifyEmail(input: {
+  public async verifyEmail(input: {
     token: string;
     code: string;
   }): Promise<{ userData: UserResponseDto; accessToken: string }> {
@@ -116,5 +116,40 @@ export class UserService {
     this.logger.log(`Email verified successfully for user: ${email}`);
     const { password, ...userData } = updatedUser;
     return { userData, accessToken };
+  }
+
+  //login
+
+  public async login(
+    dto: UserInput,
+  ): Promise<{ user: UserResponseDto; token: string }> {
+    const { email, password } = dto;
+
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      this.logger.warn(`Login failed: no user found for email ${email}`);
+      throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
+    }
+
+    const isMatch = await this.authService.comparePassword(
+      password,
+      user.password,
+    );
+    if (!isMatch) {
+      this.logger.warn(`Login failed: invalid password for email ${email}`);
+      throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
+    }
+
+    if (!user.isVerified) {
+      throw new BadRequestException(Message.EMAIL_NOT_VERIFIED);
+    }
+
+    const { password: _, ...userData } = user;
+
+    const token = await this.authService.createToken(user);
+
+    this.logger.log(`User logged in: ${user.email}`);
+    return { user: userData, token };
   }
 }

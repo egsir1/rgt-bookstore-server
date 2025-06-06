@@ -49,6 +49,28 @@ export class UserController {
       data: userData,
     });
   }
+  // login
+  @Post('login')
+  public async login(
+    @Body() input: UserInput,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    Logger.verbose(`UserController ~ login input: ${JSON.stringify(input)}`);
+    const { user, token } = await this.userService.login(input);
+    this.setTokens(res, token);
+
+    res.status(200).json({
+      message: 'Login success',
+      data: user,
+    });
+  }
+
+  @Post('logout')
+  public async logout(@Res() res: Response): Promise<void> {
+    this.clearTokens(res);
+    res.status(200).json({ message: 'Logout successful' });
+  }
 
   //set tokens
   private setTokens(res: Response, accessToken: string) {

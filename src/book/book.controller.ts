@@ -3,6 +3,7 @@ import {
   Controller,
   Logger,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -15,6 +16,7 @@ import { Request, Response } from 'express';
 import { AuthenticatedUser } from 'libs/decorators/auth.decorator';
 import { CreateBookDto } from 'libs/dto/books/book.create.dto';
 import { UserResponseDto } from 'libs/dto/user/user.response.dto';
+import { UpdateBookDto } from 'libs/dto/books/book.update.dto';
 
 @Controller('book')
 export class BookController {
@@ -27,7 +29,6 @@ export class BookController {
   @Post('create')
   async createBook(
     @Body() input: CreateBookDto,
-    @Req() req: Request,
     @Res() res: Response,
     @AuthenticatedUser() user: UserResponseDto,
   ): Promise<void> {
@@ -38,5 +39,24 @@ export class BookController {
     this.logger.debug(`Book created result: ${JSON.stringify(result)}`);
 
     res.status(201).json({ message: 'Book created', data: result });
+  }
+
+  // create book
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @Put('update')
+  async updateBook(
+    @Body() input: UpdateBookDto,
+    @Res() res: Response,
+    @AuthenticatedUser() user: UserResponseDto,
+  ): Promise<void> {
+    this.logger.debug(`Book update user: ${JSON.stringify(user)}`);
+    this.logger.verbose(`input: ${JSON.stringify(input)}`);
+    const { id } = user;
+    const { bookId, ...dto } = input;
+    const result = await this.bookService.updateBook(bookId, id, dto);
+    this.logger.debug(`Book update result: ${JSON.stringify(result)}`);
+
+    res.status(200).json({ message: 'Book updated', data: result });
   }
 }

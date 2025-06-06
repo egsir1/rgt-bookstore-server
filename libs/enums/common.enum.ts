@@ -6,7 +6,6 @@ export enum Message {
   DELETE_FAILED = 'Delete failed!',
   REMOVE_FAILED = 'Remove failed!',
   UPLOAD_FAILED = 'Upload failed!',
-  BAD_REQUEST = 'Bad Request!',
 
   USED_EMAIL = 'Already used email',
   NO_NICK = 'No user with that email!',
@@ -23,4 +22,5 @@ export enum Message {
   EMAIL_NOT_VERIFIED = 'Email not verified',
   TOKEN_MISSING = 'Authorization token is missing',
   BOOK_DUPLICATE = 'Book already exists.',
+  UNAUTHORIZED_ACTION = 'You are not authorized for that action ',
 }

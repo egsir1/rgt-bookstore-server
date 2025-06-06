@@ -36,9 +36,11 @@ export class CreateBookDto {
   thumbnailUrl?: string;
 
   @IsOptional()
+  @IsString()
   edition?: string;
 
   @IsOptional()
+  @IsString()
   publisher?: string;
 
   @IsNotEmpty()

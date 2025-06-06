@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -24,9 +25,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         : (exceptionResponse as any).message || 'Unknown error occurred';
 
     const errorStack = exception.stack || 'No stack available';
-    console.log('HttpExceptionFilter ~ errorStack:', errorStack);
-    console.log('HttpExceptionFilter ~ status:', status);
-    console.log('Error message:', errorMessage);
+    Logger.verbose(`HttpExceptionFilter ~ errorStack: ${errorStack}`);
+    Logger.error(`HttpExceptionFilter ~ status: ${status}`);
+    Logger.error(`Error message: ${errorMessage}`);
 
     response.status(status).json({
       statusCode: status,

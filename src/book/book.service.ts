@@ -10,6 +10,8 @@ import { BooksResponseDto } from 'libs/dto/books/book.response.dto';
 import { UpdateBookDto } from 'libs/dto/books/book.update.dto';
 import { Message } from 'libs/enums/common.enum';
 import { PrismaService } from 'prisma/src/prisma.service';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class BookService {
@@ -93,6 +95,28 @@ export class BookService {
       where: { id: bookId, ownerId },
       data,
     });
+  }
+
+  // delete book
+  public async deleteBook(
+    id: number,
+    ownerId: number,
+  ): Promise<BooksResponseDto> {
+    const book = await this.prisma.book.findUnique({ where: { id, ownerId } });
+
+    if (!book) throw new NotFoundException(Message.NO_DATA_FOUND);
+    if (book.thumbnailUrl) {
+      const absolutePath = path.join(process.cwd(), book.thumbnailUrl);
+      if (fs.existsSync(absolutePath)) {
+        fs.unlinkSync(absolutePath);
+      }
+    }
+    const deletedBook = await this.prisma.book.delete({
+      where: { id, ownerId },
+    });
+
+    this.logger.log(`Book and image deleted by user ${ownerId}`);
+    return deletedBook;
   }
 
   // helpers

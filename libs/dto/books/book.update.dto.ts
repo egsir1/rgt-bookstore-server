@@ -63,3 +63,10 @@ export class UpdateBookDto {
   @IsNumber({}, { message: 'print_length must be a number (float or int)' })
   print_length: number;
 }
+
+export class DeleteBookDto {
+  @IsNotEmpty()
+  @Transform(({ value }) => parseInt(value, 10))
+  @IsNumber()
+  bookId: number;
+}

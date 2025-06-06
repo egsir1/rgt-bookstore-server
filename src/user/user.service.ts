@@ -5,10 +5,14 @@ import { PrismaService } from 'prisma/src/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import * as crypto from 'crypto';
 import { UserResponseDto } from 'libs/dto/user/user.response.dto';
+import { MailService } from 'src/mail/mail.service';
+import { buildActivationEmail, subject } from 'libs/utils/email-template';
+import { verification_expiry } from 'config';
 @Injectable()
 export class UserService {
   constructor(
     private readonly authService: AuthService,
+    private readonly mailSertvice: MailService,
     private prisma: PrismaService,
   ) {}
 
@@ -41,11 +45,24 @@ export class UserService {
     });
 
     const { password, ...userData } = user;
-
     Logger.debug(`New user registered: ${user.email} (id: ${user.id})`);
-    const token = await this.authService.createToken(user, activationCode);
-    //TODO: Send email
+    const token = await this.authService.createToken(
+      user,
+      activationCode,
+      verification_expiry,
+    );
 
+    // 4. Send email
+    const htmlContent = buildActivationEmail(user.email, activationCode);
+    const mailBody = {
+      email: user.email,
+      subject,
+      text: `Your activation code is ${activationCode}`,
+      htmlContent,
+    };
+    await this.mailSertvice.sendEmail(mailBody);
+
+    // 5. return
     return { userData, token };
   }
 }

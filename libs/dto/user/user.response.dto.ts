@@ -8,4 +8,5 @@ export class UserResponseDto {
   books?: any;
   createdAt: Date;
   updatedAt: Date;
+  isVerified?: Boolean;
 }

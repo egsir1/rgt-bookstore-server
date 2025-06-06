@@ -1,7 +1,15 @@
-import { Body, Controller, Logger, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Patch,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request, Response } from 'express';
-import { UserInput } from 'libs/dto/user/user.create.dto';
+import { ActivationInput, UserInput } from 'libs/dto/user/user.create.dto';
 
 @Controller('user')
 export class UserController {
@@ -14,12 +22,31 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    Logger.verbose(`UserController ~ input: ${JSON.stringify(input)}`);
+    Logger.verbose(`UserController ~ signup input: ${JSON.stringify(input)}`);
     const { userData, token } = await this.userService.signup(input);
     res.status(201).json({
       message: 'Signup successful. Please check your email for verification.',
-      user: userData,
+      data: userData,
       verificationToken: token,
+    });
+  }
+
+  // verify
+  @Patch('verify-email')
+  public async verifyEmail(
+    @Body() input: ActivationInput,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    Logger.verbose(
+      `UserController ~ verifyEmail input: ${JSON.stringify(input)}`,
+    );
+    const { userData, accessToken } = await this.userService.verifyEmail(input);
+    this.setTokens(res, accessToken);
+
+    res.status(200).json({
+      message: 'Email activated',
+      data: userData,
     });
   }
 

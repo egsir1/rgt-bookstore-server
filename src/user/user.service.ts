@@ -1,4 +1,11 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserInput } from 'libs/dto/user/user.create.dto';
 import { Message } from 'libs/enums/common.enum';
 import { PrismaService } from 'prisma/src/prisma.service';
@@ -10,6 +17,7 @@ import { buildActivationEmail, subject } from 'libs/utils/email-template';
 import { verification_expiry } from 'config';
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
     private readonly authService: AuthService,
     private readonly mailSertvice: MailService,
@@ -28,7 +36,7 @@ export class UserService {
     });
 
     if (existingUser) {
-      Logger.error(`Signup failed: email already in use → ${email}`);
+      this.logger.error(`Signup failed: email already in use → ${email}`);
       throw new ConflictException(Message.USED_EMAIL);
     }
 
@@ -45,7 +53,7 @@ export class UserService {
     });
 
     const { password, ...userData } = user;
-    Logger.debug(`New user registered: ${user.email} (id: ${user.id})`);
+    this.logger.debug(`New user registered: ${user.email} (id: ${user.id})`);
     const token = await this.authService.createToken(
       user,
       activationCode,
@@ -64,5 +72,49 @@ export class UserService {
 
     // 5. return
     return { userData, token };
+  }
+
+  // verify email
+  async verifyEmail(input: {
+    token: string;
+    code: string;
+  }): Promise<{ userData: UserResponseDto; accessToken: string }> {
+    const { token, code } = input;
+    let payload: any;
+    try {
+      payload = await this.authService.verifyToken(token);
+    } catch (err) {
+      this.logger.warn(`Email verification failed: invalid or expired token`);
+      throw new UnauthorizedException(Message.TOKEN_NOT_EXIST);
+    }
+
+    const { email, activationCode } = payload;
+    if (!email || !activationCode) {
+      throw new BadRequestException(Message.TOKEN_NOT_EXIST);
+    }
+
+    if (activationCode !== code) {
+      this.logger.warn(`Activation code mismatch for email: ${email}`);
+      throw new BadRequestException(Message.INVALID_CODE);
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(Message.USER_NOT_FOUND);
+    }
+
+    if (user.isVerified) {
+      throw new BadRequestException(Message.VERIFIED_EMAIL);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { email },
+      data: { isVerified: true },
+    });
+    const accessToken = await this.authService.createToken(updatedUser);
+
+    this.logger.log(`Email verified successfully for user: ${email}`);
+    const { password, ...userData } = updatedUser;
+    return { userData, accessToken };
   }
 }

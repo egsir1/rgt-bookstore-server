@@ -19,3 +19,13 @@ export class UserInput {
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
 }
+
+export class ActivationInput {
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @IsNotEmpty()
+  @IsString()
+  token: string;
+}

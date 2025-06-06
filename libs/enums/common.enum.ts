@@ -17,4 +17,7 @@ export enum Message {
   TOKEN_NOT_EXIST = 'Token is invalid or expired',
   ONLY_SPECIFIC_ROLES_ALLOWED = 'Allowed only for users with specific roles',
   NOT_ALLOWED_REQUEST = 'Not Allowed Request!',
+  VERIFIED_EMAIL = 'Email already verified',
+  USER_NOT_FOUND = 'User not found',
+  INVALID_CODE = 'Invalid activation code.',
 }

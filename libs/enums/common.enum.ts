@@ -21,4 +21,6 @@ export enum Message {
   USER_NOT_FOUND = 'User not found',
   INVALID_CODE = 'Invalid activation code.',
   EMAIL_NOT_VERIFIED = 'Email not verified',
+  TOKEN_MISSING = 'Authorization token is missing',
+  BOOK_DUPLICATE = 'Book already exists.',
 }

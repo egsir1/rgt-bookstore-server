@@ -25,7 +25,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         : (exceptionResponse as any).message || 'Unknown error occurred';
 
     const errorStack = exception.stack || 'No stack available';
-    Logger.verbose(`HttpExceptionFilter ~ errorStack: ${errorStack}`);
+    Logger.warn(`HttpExceptionFilter ~ errorStack: ${errorStack}`);
     Logger.error(`HttpExceptionFilter ~ status: ${status}`);
     Logger.error(`Error message: ${errorMessage}`);
 

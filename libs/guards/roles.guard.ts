@@ -3,13 +3,17 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Message } from 'libs/enums/common.enum';
 import { AuthService } from 'src/auth/auth.service';
 
+@Injectable()
 export class RolesGuard implements CanActivate {
+  private readonly logger = new Logger(RolesGuard.name);
   constructor(
     private reflector: Reflector,
     private readonly authService: AuthService,
@@ -17,32 +21,27 @@ export class RolesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    console.log('🚀 ~ RolesGuard ~ canActivate ~ roles:', roles);
-
+    this.logger.debug(`RolesGuard ~ canActivate ~ roles: ${roles}`);
     if (!roles) return true;
     const request = context.switchToHttp().getRequest();
     const bearerToken = request.headers.authorization;
-    const cookieToken = request.cookies?.access_token;
+    const cookieToken = request.cookies?.accessToken;
 
     const token = bearerToken?.split(' ')[1] || cookieToken;
-    console.log('🚀 ~ RolesGuard ~ canActivate ~ token:', token);
+    this.logger.debug(`RolesGuard ~ canActivate ~ token: ${token}`);
     if (!token) {
-      throw new BadRequestException('Authorization token is missing');
+      throw new BadRequestException(Message.TOKEN_MISSING);
     }
     try {
-      const secret = process.env.JWT_ACCESS_SECRET;
-      console.log('🚀 ~ RolesGuard ~ canActivate ~ secret:', secret);
       const user = await this.authService.verifyToken(token);
-
       if (!user) {
-        throw new UnauthorizedException('Invalid token');
+        throw new UnauthorizedException(Message.TOKEN_NOT_EXIST);
       }
 
       const hasRole = () => roles.includes(user.role);
       const hasPermission: boolean = hasRole();
-      console.log(
-        '🚀 ~ RolesGuard ~ canActivate ~ hasPermission:',
-        hasPermission,
+      this.logger.debug(
+        `RolesGuard ~ canActivate ~ hasPermission: ${hasPermission}`,
       );
 
       if (!hasPermission) {
@@ -52,8 +51,8 @@ export class RolesGuard implements CanActivate {
       request.user = user;
       return true;
     } catch (err) {
-      console.error('AuthGuard Error:', err);
-      throw new UnauthorizedException('Authentication failed');
+      this.logger.error(`AuthGuard Error: ${err}`);
+      throw new UnauthorizedException(Message.ONLY_SPECIFIC_ROLES_ALLOWED);
     }
   }
 }

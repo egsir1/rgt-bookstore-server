@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import { HttpExceptionFilter } from 'libs/http-exception.filter';
 import { LoggingInterceptor } from 'libs/interceptor/logging-interceptor';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
@@ -16,7 +17,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalInterceptors(new LoggingInterceptor());
-
+  app.use(cookieParser());
   app.use('/uploads', express.static('./uploads'));
   app.enableCors({
     origin: [

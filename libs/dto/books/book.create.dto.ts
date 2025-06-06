@@ -56,9 +56,4 @@ export class CreateBookDto {
   @Transform(({ value }) => parseFloat(value))
   @IsNumber({}, { message: 'print_length must be a number (float or int)' })
   print_length: number;
-
-  @IsNotEmpty()
-  @Transform(({ value }) => parseInt(value, 10))
-  @IsNumber()
-  ownerId: number;
 }

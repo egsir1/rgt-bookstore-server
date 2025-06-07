@@ -62,3 +62,9 @@ enum BookCategory {
   CHILDREN
   FANTASY
 }
+
+enum BookStatus {
+  ACTIVE
+  PAUSED
+  SOLD_OUT
+}

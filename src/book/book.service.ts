@@ -12,6 +12,7 @@ import { Message } from 'libs/enums/common.enum';
 import { PrismaService } from 'prisma/src/prisma.service';
 import * as path from 'path';
 import * as fs from 'fs';
+import { BookCategory, BookStatus, Role } from '@prisma/client';
 
 @Injectable()
 export class BookService {
@@ -119,12 +120,74 @@ export class BookService {
     return deletedBook;
   }
 
-  // helpers
-  private async getBookById(id: number): Promise<BooksResponseDto> {
+  public async getBookById(id: number): Promise<BooksResponseDto> {
     const book = await this.prisma.book.findUnique({ where: { id } });
     if (!book) {
       throw new NotFoundException(Message.NO_DATA_FOUND);
     }
     return book;
+  }
+
+  // get all books
+  public async getAllBooks(params: {
+    page: number;
+    limit: number;
+    search?: string;
+    sort?: 'newest' | 'top_rated' | 'most_sold';
+    category?: BookCategory;
+    role?: Role;
+  }): Promise<{
+    data: BooksResponseDto[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sort = 'newest',
+      category,
+      role,
+    } = params;
+
+    const whereClause: any = {};
+
+    if (role !== 'ADMIN') {
+      whereClause.status = BookStatus.ACTIVE;
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { author: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (category) {
+      whereClause.category = category;
+    }
+
+    let orderByClause: any = { createdAt: 'desc' };
+    if (sort === 'top_rated') orderByClause = { ratings: 'desc' };
+    else if (sort === 'most_sold') orderByClause = { soldCount: 'desc' };
+
+    const [total, books] = await this.prisma.$transaction([
+      this.prisma.book.count({ where: whereClause }),
+      this.prisma.book.findMany({
+        where: whereClause,
+        orderBy: orderByClause,
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+    ]);
+
+    return {
+      data: books,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

@@ -154,7 +154,7 @@ export class BookService {
     const whereClause: any = {};
 
     if (role !== 'ADMIN') {
-      whereClause.status = BookStatus.ACTIVE;
+      whereClause.book_status = BookStatus.ACTIVE;
     }
 
     if (search) {

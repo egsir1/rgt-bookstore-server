@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Logger,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -18,6 +20,8 @@ import { AuthenticatedUser } from 'libs/decorators/auth.decorator';
 import { CreateBookDto } from 'libs/dto/books/book.create.dto';
 import { UserResponseDto } from 'libs/dto/user/user.response.dto';
 import { DeleteBookDto, UpdateBookDto } from 'libs/dto/books/book.update.dto';
+import { OptionalAuthGuard } from 'libs/guards/optional.guard';
+import { allBooksDto } from 'libs/dto/books/book.response.dto';
 
 @Controller('book')
 export class BookController {
@@ -80,5 +84,28 @@ export class BookController {
     this.logger.debug(`Book delete result: ${JSON.stringify(result)}`);
 
     res.status(200).json({ message: 'Book deleted', data: result });
+  }
+
+  //  get all books
+  @UseGuards(OptionalAuthGuard)
+  @Get('all-books')
+  async getBooks(
+    @Query() query: allBooksDto,
+    @AuthenticatedUser() user: UserResponseDto,
+  ) {
+    const role = user?.role ?? undefined;
+    this.logger.debug(
+      `BookController ~ getBooks ~ query: ${JSON.stringify(query)}`,
+    );
+    this.logger.debug(`allBooks role: ${role}`);
+
+    return this.bookService.getAllBooks({
+      page: query.page,
+      limit: query.limit,
+      search: query.search,
+      sort: query.sort,
+      category: query.category,
+      role,
+    });
   }
 }

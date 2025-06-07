@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Logger,
-  Patch,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Logger, Patch, Post, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { ActivationInput, UserInput } from 'libs/dto/user/user.create.dto';
 
 @Controller('user')
@@ -19,7 +11,6 @@ export class UserController {
   @Post('signup')
   public async signup(
     @Body() input: UserInput,
-    @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
     Logger.verbose(`UserController ~ signup input: ${JSON.stringify(input)}`);
@@ -35,7 +26,6 @@ export class UserController {
   @Patch('verify-email')
   public async verifyEmail(
     @Body() input: ActivationInput,
-    @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
     Logger.verbose(
@@ -53,7 +43,6 @@ export class UserController {
   @Post('login')
   public async login(
     @Body() input: UserInput,
-    @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
     Logger.verbose(`UserController ~ login input: ${JSON.stringify(input)}`);

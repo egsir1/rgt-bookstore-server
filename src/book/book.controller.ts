@@ -4,24 +4,26 @@ import {
   Delete,
   Get,
   Logger,
+  NotFoundException,
+  Param,
   Post,
   Put,
   Query,
-  Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { Roles } from 'libs/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { RolesGuard } from 'libs/guards/roles.guard';
-import { Request, Response } from 'express';
 import { AuthenticatedUser } from 'libs/decorators/auth.decorator';
 import { CreateBookDto } from 'libs/dto/books/book.create.dto';
 import { UserResponseDto } from 'libs/dto/user/user.response.dto';
 import { DeleteBookDto, UpdateBookDto } from 'libs/dto/books/book.update.dto';
 import { OptionalAuthGuard } from 'libs/guards/optional.guard';
-import { allBooksDto } from 'libs/dto/books/book.response.dto';
+import {
+  allBooksDto,
+  BooksResponseDto,
+} from 'libs/dto/books/book.response.dto';
 
 @Controller('book')
 export class BookController {
@@ -34,16 +36,15 @@ export class BookController {
   @Post('create')
   async createBook(
     @Body() input: CreateBookDto,
-    @Res() res: Response,
     @AuthenticatedUser() user: UserResponseDto,
-  ): Promise<void> {
+  ): Promise<BooksResponseDto> {
     this.logger.debug(`Book create user: ${JSON.stringify(user)}`);
     this.logger.verbose(`input: ${JSON.stringify(input)}`);
     const { id } = user;
     const result = await this.bookService.createBook(id, input);
     this.logger.debug(`Book created result: ${JSON.stringify(result)}`);
 
-    res.status(201).json({ message: 'Book created', data: result });
+    return result;
   }
 
   // update book
@@ -52,9 +53,8 @@ export class BookController {
   @Put('update')
   async updateBook(
     @Body() input: UpdateBookDto,
-    @Res() res: Response,
     @AuthenticatedUser() user: UserResponseDto,
-  ): Promise<void> {
+  ): Promise<BooksResponseDto> {
     this.logger.debug(`Book update user: ${JSON.stringify(user)}`);
     this.logger.verbose(`input: ${JSON.stringify(input)}`);
     const { id } = user;
@@ -62,20 +62,17 @@ export class BookController {
     const result = await this.bookService.updateBook(bookId, id, dto);
     this.logger.debug(`Book update result: ${JSON.stringify(result)}`);
 
-    res.status(200).json({ message: 'Book updated', data: result });
+    return result;
   }
 
   // delete book
-
-  // create book
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Delete('delete')
   async deleteBook(
     @Body() input: DeleteBookDto,
-    @Res() res: Response,
     @AuthenticatedUser() user: UserResponseDto,
-  ): Promise<void> {
+  ): Promise<BooksResponseDto> {
     this.logger.debug(`Book delete user: ${JSON.stringify(user)}`);
     this.logger.verbose(`input: ${JSON.stringify(input)}`);
     const { id } = user;
@@ -83,7 +80,7 @@ export class BookController {
     const result = await this.bookService.deleteBook(bookId, id);
     this.logger.debug(`Book delete result: ${JSON.stringify(result)}`);
 
-    res.status(200).json({ message: 'Book deleted', data: result });
+    return result;
   }
 
   //  get all books
@@ -99,7 +96,7 @@ export class BookController {
     );
     this.logger.debug(`allBooks role: ${role}`);
 
-    return this.bookService.getAllBooks({
+    return await this.bookService.getAllBooks({
       page: query.page,
       limit: query.limit,
       search: query.search,
@@ -107,5 +104,16 @@ export class BookController {
       category: query.category,
       role,
     });
+  }
+
+  // get single book
+  @Get(':id')
+  async getBookById(@Param('id') id: string): Promise<BooksResponseDto> {
+    const bookId = parseInt(id, 10);
+    if (isNaN(bookId)) {
+      throw new NotFoundException('Invalid book ID');
+    }
+
+    return await this.bookService.getBookById(bookId, true);
   }
 }

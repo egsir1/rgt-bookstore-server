@@ -92,10 +92,12 @@ export class BookService {
 
     data.updatedAt = new Date();
 
-    return this.prisma.book.update({
+    const result = await this.prisma.book.update({
       where: { id: bookId, ownerId },
       data,
     });
+
+    return result;
   }
 
   // delete book
@@ -120,11 +122,19 @@ export class BookService {
     return deletedBook;
   }
 
-  public async getBookById(id: number): Promise<BooksResponseDto> {
-    const book = await this.prisma.book.findUnique({ where: { id } });
+  public async getBookById(
+    id: number,
+    includeOwner: boolean = false,
+  ): Promise<BooksResponseDto> {
+    const book = await this.prisma.book.findUnique({
+      where: { id },
+      include: includeOwner ? { owner: true } : undefined,
+    });
+
     if (!book) {
       throw new NotFoundException(Message.NO_DATA_FOUND);
     }
+
     return book;
   }
 

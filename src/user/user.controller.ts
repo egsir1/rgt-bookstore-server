@@ -1,7 +1,20 @@
-import { Body, Controller, Logger, Patch, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  NotFoundException,
+  Patch,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Response } from 'express';
 import { ActivationInput, UserInput } from 'libs/dto/user/user.create.dto';
+import { AuthGuard } from 'libs/guards/auth.guard';
+import { AuthenticatedUser } from 'libs/decorators/auth.decorator';
+import { UserResponseDto } from 'libs/dto/user/user.response.dto';
 
 @Controller('user')
 export class UserController {
@@ -59,6 +72,16 @@ export class UserController {
   public async logout(@Res() res: Response): Promise<void> {
     this.clearTokens(res);
     res.status(200).json({ message: 'Logout successful' });
+  }
+
+  // get me
+  @UseGuards(AuthGuard)
+  @Get('me')
+  async getMe(@AuthenticatedUser() user: UserResponseDto) {
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   //set tokens

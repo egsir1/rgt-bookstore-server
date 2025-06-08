@@ -16,7 +16,7 @@ npm run build
 echo "▶ Restarting PM2 process: rgt-api"
 pm2 delete rgt-api 2>/dev/null || true
 
-pm2 start dist/main.js          \
+pm2 start dist/src/main.js          \
      --name rgt-api             \
      --env production           \
      --time                     \

@@ -21,12 +21,11 @@ async function bootstrap() {
   app.use('/uploads', express.static('./uploads'));
   app.enableCors({
     origin: [
-      'https://cvcons.com',
-      'http://cvcons.com',
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:4000',
       'http://localhost:4001',
+      'http://191.96.31.116:8000',
     ],
     credentials: true,
   });

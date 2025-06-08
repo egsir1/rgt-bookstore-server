@@ -89,7 +89,8 @@ export class UserController {
     const isProduction = process.env.NODE_ENV === 'production';
     const accessCookieOptions = {
       httpOnly: true,
-      secure: isProduction,
+      secure: false,
+      // secure: isProduction,
       sameSite: 'lax' as const,
       // httpOnly: false,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -103,7 +104,7 @@ export class UserController {
   private clearTokens(res: Response) {
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax' as const,
       expires: new Date(0),
     };

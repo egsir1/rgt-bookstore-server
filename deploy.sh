@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
 
-echo "▶ Installing & building NestJS"
+set -e  # exit on error
+
+echo "▶ Pulling latest NestJS code..."
+git reset --hard
+git checkout master
+git pull origin master
+
+echo "▶ Installing dependencies..."
 npm install
-npm run build                
 
-echo "▶ (Re)starting PM2 process rgt-api"
+echo "▶ Building NestJS project..."
+npm run build
+
+echo "▶ Restarting PM2 process: rgt-api"
 pm2 delete rgt-api 2>/dev/null || true
-pm2 start dist/main.js         \
-     --name rgt-api            \
-     --env production          \
-     --time                    # timestamps in logs
 
-pm2 save                       # auto-restart on reboot
-echo "✅ API running on :7000  |  pm2 logs rgt-api"
+pm2 start dist/main.js          \
+     --name rgt-api             \
+     --env production           \
+     --time                     \
+     --update-env               # reload .env vars
+
+pm2 save
+
+echo "✅ API running on port 7000  |  View logs: pm2 logs rgt-api"

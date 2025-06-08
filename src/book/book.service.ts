@@ -84,8 +84,7 @@ export class BookService {
     if (dto.thumbnailUrl) data.thumbnailUrl = dto.thumbnailUrl;
     if (dto.edition) data.edition = dto.edition;
     if (dto.publisher) data.publisher = dto.publisher;
-    if (dto.publication_date)
-      data.publication_date = new Date(dto.publication_date);
+    if (dto.publication_date) data.publication_date = dto.publication_date;
     if (dto.category) data.category = dto.category;
     if (dto.language) data.language = dto.language;
     if (dto.print_length !== undefined) data.print_length = dto.print_length;

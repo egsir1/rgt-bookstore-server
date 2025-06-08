@@ -31,7 +31,7 @@ model Book {
   ratings      Int      @default(0)
   edition      String?
   publisher    String?
-  publication_date      DateTime
+  publication_date      String
   category     BookCategory
   language     String
   print_length Int

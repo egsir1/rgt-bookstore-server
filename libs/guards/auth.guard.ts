@@ -20,8 +20,9 @@ export class AuthGuard implements CanActivate {
     this.logger.debug(`AuthGuard ~ canActivate ~ bearerToken: ${bearerToken}`);
     const cookieToken = request.cookies?.accessToken;
     this.logger.debug(
-      `AuthGuard ~ canActivate ~ request.cookies ${request.cookies}`,
+      `AuthGuard ~ canActivate ~ request.cookies ${JSON.stringify(request.cookies)}`,
     );
+
     console.log('🚀 ~ AuthGuard ~ canActivate ~ cookieToken:', cookieToken);
 
     const token = bearerToken?.split(' ')[1] || cookieToken;

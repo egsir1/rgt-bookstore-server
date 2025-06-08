@@ -20,7 +20,7 @@ export class BooksResponseDto {
   ratings: number;
   edition?: string | null;
   publisher?: string | null;
-  publication_date: Date;
+  publication_date: string;
   category: BookCategory;
   language: string;
   print_length: number;

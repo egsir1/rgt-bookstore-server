@@ -44,7 +44,7 @@ export class CreateBookDto {
   publisher?: string;
 
   @IsNotEmpty()
-  publication_date: Date;
+  publication_date: string;
 
   @IsNotEmpty()
   @IsEnum(BookCategory)
